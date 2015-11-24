@@ -1,0 +1,21 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl3/jar/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/mintools.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/vecmath.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/libs" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl3/doc/javadoc.zip!/" />
+    </JAVADOC>
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/libs/lwjgl3/native" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/libs/lwjgl3" />
+      <root url="jar://$PROJECT_DIR$/libs/mintools.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/vecmath.jar!/" />
+    </SOURCES>
+  </library>
+</component>

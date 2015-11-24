@@ -1,40 +1,29 @@
-package sandbox;
+package sandbox.cube;
 
-import org.lwjgl.*;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class HelloWorld {
+public class WindowManager {
 
   // We need to strongly reference callback instances.
   private GLFWErrorCallback errorCallback;
-  private GLFWKeyCallback   keyCallback;
-
+  private GLFWKeyCallback keyCallback;
+  private int width, height;
+  private String title;
   // The window handle
   private long window;
 
-  public void run() {
-    System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
-    try {
-      init();
-      loop();
-
-      // Release window and window callbacks
-      glfwDestroyWindow(window);
-      keyCallback.release();
-    } finally {
-      // Terminate GLFW and release the GLFWErrorCallback
-      glfwTerminate();
-      errorCallback.release();
-    }
+  public WindowManager(String title, int width, int height) {
+    this.title = title;
+    this.width = width;
+    this.height = height;
   }
 
-  private void init() {
+  public void init() {
     // Setup an error callback. The default implementation
     // will print the error message in System.err.
     glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -48,11 +37,11 @@ public class HelloWorld {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-    int WIDTH = 300;
-    int HEIGHT = 300;
+    int WIDTH = width;
+    int HEIGHT = height;
 
     // Create the window
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, title, NULL, NULL);
     if ( window == NULL )
       throw new RuntimeException("Failed to create the GLFW window");
 
@@ -83,32 +72,25 @@ public class HelloWorld {
     glfwShowWindow(window);
   }
 
-  private void loop() {
-    // This line is critical for LWJGL's interoperation with GLFW's
-    // OpenGL context, or any context that is managed externally.
-    // LWJGL detects the context that is current in the current thread,
-    // creates the GLCapabilities instance and makes the OpenGL
-    // bindings available for use.
-    GL.createCapabilities();
 
-    // Set the clear color
-    glClearColor(0x5d/255.f, 0xbf/255.f, 0xde/255.f, 0.0f);
-
-    // Run the rendering loop until the user has attempted to close
-    // the window or has pressed the ESCAPE key.
-    while ( glfwWindowShouldClose(window) == GLFW_FALSE ) {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-      glfwSwapBuffers(window); // swap the color buffers
-
-      // Poll for window events. The key callback above will only be
-      // invoked during this call.
-      glfwPollEvents();
-    }
+  public void release() {
+    // Release window and window callbacks
+    glfwDestroyWindow(window);
+    keyCallback.release();
   }
 
-  public static void main(String[] args) {
-    new HelloWorld().run();
+  public void terminate() {
+    // Terminate GLFW and release the GLFWErrorCallback
+    glfwTerminate();
+    errorCallback.release();
+  }
+
+  public boolean shouldClose() {
+    return glfwWindowShouldClose(window) == GLFW_TRUE;
+  }
+
+  public long getWindowId() {
+    return window;
   }
 
 }
