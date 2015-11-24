@@ -52,6 +52,7 @@ public class WindowManager {
       glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL11.GL_TRUE);
     }
 
+
     int WIDTH = width;
     int HEIGHT = height;
 
