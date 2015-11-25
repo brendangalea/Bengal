@@ -1,6 +1,6 @@
 package toolbox.utils;
 
-import rendering.components.Camera;
+import rendering.utils.Camera;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;

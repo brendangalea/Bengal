@@ -1,4 +1,4 @@
-package rendering.components;
+package rendering.utils;
 
 import input.KeyboardHandler;
 import org.lwjgl.glfw.GLFW;

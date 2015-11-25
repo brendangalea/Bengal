@@ -5,8 +5,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 import rendering.components.RawModel;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
@@ -55,21 +59,21 @@ public class Loader {
 //    return new RawModel(vaoId, indices.limit());
 //  }
 
-//  public int loadTexture(String filename) {
-//    Texture texture = null;
-//    try (FileInputStream res = new FileInputStream("res/" + filename + ".png")) {
-//      texture = TextureLoader.getTexture("PNG", res);
-//    } catch (IOException e) {
-//      System.err.println("Failed to load deprecated.texture: " + filename);
-//      e.printStackTrace();
-//      System.exit(-1);
-//    }
-//    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-//    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-//    int textureId = texture.getTextureID();
-//    textures.add(textureId);
-//    return textureId;
-//  }
+  public int loadTexture(String filename) {
+    Texture texture = null;
+    try (FileInputStream res = new FileInputStream("res/" + filename + ".png")) {
+      texture = TextureLoader.getTexture("PNG", res);
+    } catch (IOException e) {
+      System.err.println("Failed to load deprecated.texture: " + filename);
+      e.printStackTrace();
+      System.exit(-1);
+    }
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+    int textureId = texture.getTextureID();
+    textures.add(textureId);
+    return textureId;
+  }
 
 
   public void cleanUp() {

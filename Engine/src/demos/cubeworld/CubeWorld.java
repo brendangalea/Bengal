@@ -5,7 +5,10 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import rendering.shaders.sandbox.SandboxShader;
+import rendering.utils.Camera;
 import rendering.components.RawModel;
+import rendering.components.ShaderProgram;
 import rendering.utils.Loader;
 import rendering.utils.WindowManager;
 
@@ -23,12 +26,23 @@ public class CubeWorld {
       -0.5f, 0.5f, 0f,
       -0.5f, -0.5f, 0f,
       0.5f, -0.5f, 0f,
-      0.5f, -0.5f, 0f,
       0.5f, 0.5f, 0f,
-      -0.5f, 0.5f, 0f
+  };
+
+  private static final int[] indices = {
+      0, 1, 3, 3, 1, 2
+  };
+
+  private static final float[] uvs = {
+      0.f, 0.f,
+      0.f, 1.f,
+      1.f, 1.f,
+      1.f, 0.f
   };
 
   private WindowManager windowManager = new WindowManager("Cube Demo", 480, 320);
+  private Camera camera = new Camera();
+  private ShaderProgram shader;
 
   public static void main(String[] args) {
     new CubeWorld().run();
@@ -47,12 +61,43 @@ public class CubeWorld {
   }
 
   public void render(RawModel model) {
+//    FloatBuffer viewBuffer = Buffers.bufferWithMatrix(Matrices.createViewMatrix(camera));
+//    GL20.glUniformMatrix4fv(
+//        shader.getUniforms().get(Uniform.VIEWING),
+//        false,
+//        viewBuffer);
+
     GL30.glBindVertexArray(model.getVaoId());
     GL20.glEnableVertexAttribArray(0);
-    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+    GL20.glEnableVertexAttribArray(1);
+//    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+    GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
     GL20.glDisableVertexAttribArray(0);
+    GL20.glEnableVertexAttribArray(1);
     GL30.glBindVertexArray(0);
   }
+
+  private void setupViewingMatrices() {
+    // set up projection
+//    FloatBuffer projectionBuffer = Buffers.bufferWithMatrix(
+//        Matrices.createProjectionMatrix(0.1f, 1000f, 70f, windowManager.getWidth(), windowManager.getHeight()));
+//    GL20.glUniformMatrix4fv(
+//        shader.getUniforms().get(Uniform.PROJECTION),
+//        false,
+//        projectionBuffer);
+//    // Transformation
+//    FloatBuffer transformation = Buffers.identityMatrix4f();
+//    GL20.glUniformMatrix4fv(
+//        shader.getUniforms().get(Uniform.TRANSFORMATION),
+//        false,
+//        transformation);
+//    // Inverse Transform
+//    GL20.glUniformMatrix4fv(
+//        shader.getUniforms().get(Uniform.INVERSE_TRANSFORMATION),
+//        false,
+//        transformation);
+  }
+
   public void loop() {
     // This line is critical for LWJGL's interoperation with GLFW's
     // OpenGL context, or any context that is managed externally.
@@ -61,18 +106,22 @@ public class CubeWorld {
     // bindings available for use.
     GL.createCapabilities();
 
-    // Set the clear color
-    glClearColor(0x5d/255.f, 0xbf/255.f, 0xde/255.f, 0.0f);
-
+    // initialize phong shader
+//    shader = new PhongShader();
     Loader loader = new Loader();
+    RawModel model = loader.loadToVao(vertices, uvs, indices);
+    shader = new SandboxShader();
+    shader.init();
+    shader.start();
 
-    RawModel model = loader.loadToVao(vertices);
-    System.out.println(model.getVertexCount());
+    // Set the clear color
+    glClearColor(0x5d / 255.f, 0xbf / 255.f, 0xde / 255.f, 0.0f);
+
     // Run the rendering loop until the user has attempted to close
     // the window or has pressed the ESCAPE key.
     while (!windowManager.shouldClose()) {
+      camera.move();
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
       render(model);
 
       glfwSwapBuffers(windowManager.getWindowId()); // swap the color buffers
@@ -82,6 +131,7 @@ public class CubeWorld {
       glfwPollEvents();
     }
 
+    shader.cleanUp();
     loader.cleanUp();
   }
 }

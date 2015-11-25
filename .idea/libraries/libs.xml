@@ -4,6 +4,7 @@
       <root url="jar://$PROJECT_DIR$/libs/lwjgl3/jar/lwjgl.jar!/" />
       <root url="jar://$PROJECT_DIR$/libs/mintools.jar!/" />
       <root url="jar://$PROJECT_DIR$/libs/vecmath.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/slick-util.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="file://$PROJECT_DIR$/libs" />

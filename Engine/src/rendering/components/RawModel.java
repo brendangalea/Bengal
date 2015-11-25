@@ -4,12 +4,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import rendering.shaders.ShaderProgram;
-import rendering.utils.Loader;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A raw model is a wrapper for a vao object
@@ -33,6 +32,11 @@ public class RawModel {
 
   public HashMap<Attribute, Integer> getVbos() { return vbos; }
 
+  public void release() {
+    GL30.glDeleteVertexArrays(vaoId);
+    vbos.values().stream().forEach(GL15::glDeleteBuffers);
+  }
+
   public static class Builder {
 
     private IntBuffer indices;
@@ -51,25 +55,26 @@ public class RawModel {
       return this;
     }
 
-    public RawModel build(ShaderProgram shader, Loader loader) {
-      int vaoId = createVao(loader);
+    public RawModel build(Map<Attribute, Integer> bindings) {
+
+      int vaoId = GL30.glGenVertexArrays();
+      GL30.glBindVertexArray(vaoId);
+
       int count = 0;
       if (indices != null) {
-        bindIndicesBuffer(loader, indices);
+        bindIndicesBuffer(indices);
         count = indices.limit()/3;
       }
 
-      for (HashMap.Entry<Attribute, Integer> entry: shader.getAttributes().entrySet()) {
+      for (HashMap.Entry<Attribute, Integer> entry: bindings.entrySet()) {
         Attribute attribute = entry.getKey();
         int attributeId = entry.getValue();
         if (!attributes.containsKey(attribute)) {
-          // TODO create specific exception
-          throw new RuntimeException("Model does not have required shader attribute: " + attribute);
+          throw new IllegalArgumentException("Model does not have required shader attribute: " + attribute);
         }
         int vboId = GL15.glGenBuffers();
         vbos.put(attribute, vboId);
         int usage = dynamic.get(attribute) ? GL15.GL_STREAM_DRAW : GL15.GL_STATIC_DRAW;
-        loader.addVbo(vboId);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, attributes.get(attribute), usage);
         GL20.glVertexAttribPointer(attributeId, attribute.getSize(), GL11.GL_FLOAT, false, 0, 0);
@@ -79,27 +84,16 @@ public class RawModel {
       }
 
 
-      unbindVao();
+      GL30.glBindVertexArray(0);
       return new RawModel(vaoId, count, vbos);
     }
 
 
-    private int createVao(Loader loader) {
-      int vaoId = GL30.glGenVertexArrays();
-      GL30.glBindVertexArray(vaoId);
-      loader.addVao(vaoId);
-      return vaoId;
-    }
-
-    private void unbindVao() {
-      GL30.glBindVertexArray(0);
-    }
-
-    private void bindIndicesBuffer(Loader loader, IntBuffer indices) {
+    private void bindIndicesBuffer(IntBuffer indices) {
       int vboId = GL15.glGenBuffers();
-      loader.addVbo(vboId);
       GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
       GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
+      vbos.put(Attribute.INDICES, vboId);
     }
 
 

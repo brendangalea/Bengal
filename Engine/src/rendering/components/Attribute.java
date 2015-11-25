@@ -5,19 +5,26 @@ package rendering.components;
  *
  * Created by Brendan Galea on 11/23/2015.
  */
-public enum Attribute {
-  POSITION("position", 3, Type.FLOAT),
-  NORMAL("normal", 3, Type.FLOAT),
-  TEXTURE_COORDS("textureCoords", 2, Type.FLOAT),
-  COLOR("color", 3, Type.FLOAT),
-  SIZE("size", 1, Type.FLOAT),
-  INDEX("index", 1, Type.FLOAT);
+public class Attribute {
+
+  public enum Type {BOOL, INT, FLOAT}
+
+  public static Attribute POSITION = new Attribute("position", 3, Type.FLOAT);
+  public static Attribute NORMAL = new Attribute("normal", 3, Type.FLOAT);
+  public static Attribute TEXTURE_COORDS = new Attribute("textureCoords", 2, Type.FLOAT);
+  public static Attribute COLOR = new Attribute("color", 3, Type.FLOAT);
+  public static Attribute SIZE = new Attribute("size", 1, Type.FLOAT);
+  public static Attribute INDEX = new Attribute("index", 1, Type.FLOAT);
+  public static Attribute INDICES = new Attribute("INDICES", 1, Type.INT);
+  public static Attribute BANANA = new Attribute("banana", 2, Type.FLOAT);
+
+
 
   private final String name;
   private final int size;
   private final Type type;
 
-  Attribute(String name, int size, Type type) {
+  public Attribute(String name, int size, Type type) {
     this.name = name;
     this.size = size;
     this.type = type;
@@ -35,6 +42,30 @@ public enum Attribute {
     return type;
   }
 
-  public enum Type {FLOAT, INT}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
+    Attribute attribute = (Attribute) o;
+    return size == attribute.size && name.equals(attribute.name) && type == attribute.type;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name.hashCode();
+    result = 31 * result + size;
+    result = 31 * result + type.hashCode();
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "Attribute{" +
+        "name='" + name + '\'' +
+        ", size=" + size +
+        ", type=" + type +
+        '}';
+  }
 }

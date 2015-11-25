@@ -93,4 +93,11 @@ public class WindowManager {
     return window;
   }
 
+  public int getWidth() {
+    return width;
+  }
+
+  public int getHeight() {
+    return height;
+  }
 }
