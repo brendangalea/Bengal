@@ -79,7 +79,6 @@ public abstract class ShaderProgram {
         bindings.put(attribute, location++);
       }
     }
-    System.out.println(bindings);
     return bindings;
   }
 
@@ -100,7 +99,6 @@ public abstract class ShaderProgram {
       }
       int location = bindings.get(attribute);
       attributes.put(attribute, location);
-      System.out.println("Binding: " + attribute.getName() + " to " + location);
       GL20.glBindAttribLocation(programId, location, attribute.getName());
     }
   }

@@ -38,8 +38,8 @@ public class Matrices {
     matrix.m00 = xScale;
     matrix.m11 = yScale;
     matrix.m22 = -((far + near) / frustumLength);
-    matrix.m23 = -1;
-    matrix.m32 = -((2 * near * far) / frustumLength);
+    matrix.m32 = -1;
+    matrix.m23 = -((2 * near * far) / frustumLength);
     matrix.m33 = 0;
     return matrix;
   }

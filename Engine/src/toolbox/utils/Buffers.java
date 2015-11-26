@@ -4,6 +4,7 @@ import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Collection;
 
 /**
@@ -25,10 +26,10 @@ public class Buffers {
 
   public static FloatBuffer bufferWithMatrix(Matrix4f matrix) {
     FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
-    buffer.put(matrix.m00).put(matrix.m01).put(matrix.m02).put(matrix.m03);
-    buffer.put(matrix.m10).put(matrix.m11).put(matrix.m12).put(matrix.m13);
-    buffer.put(matrix.m20).put(matrix.m21).put(matrix.m22).put(matrix.m23);
-    buffer.put(matrix.m30).put(matrix.m31).put(matrix.m32).put(matrix.m33);
+    buffer.put(matrix.m00).put(matrix.m10).put(matrix.m20).put(matrix.m30);
+    buffer.put(matrix.m01).put(matrix.m11).put(matrix.m21).put(matrix.m31);
+    buffer.put(matrix.m02).put(matrix.m12).put(matrix.m22).put(matrix.m32);
+    buffer.put(matrix.m03).put(matrix.m13).put(matrix.m23).put(matrix.m33);
     buffer.flip();
     return buffer;
   }
@@ -42,6 +43,19 @@ public class Buffers {
     return buffer;
   }
 
+  public static FloatBuffer bufferWithValues(float[] values) {
+    FloatBuffer buffer = BufferUtils.createFloatBuffer(values.length);
+    buffer.put(values);
+    buffer.flip();
+    return buffer;
+  }
+
+  public static IntBuffer bufferWithValues(int[] values) {
+    IntBuffer buffer = BufferUtils.createIntBuffer(values.length);
+    buffer.put(values);
+    buffer.flip();
+    return buffer;
+  }
   public static FloatBuffer bufferWithPattern(float[] pattern, int repeat) {
     FloatBuffer buffer = BufferUtils.createFloatBuffer(pattern.length * repeat);
     for (int i = 0; i < repeat; i++) {
@@ -73,10 +87,10 @@ public class Buffers {
     return interleaved;
   }
 
-  public static void storeMatrixInBuffer(Matrix4f matrix, FloatBuffer buffer) {
-    buffer.put(matrix.m00).put(matrix.m01).put(matrix.m02).put(matrix.m03);
-    buffer.put(matrix.m10).put(matrix.m11).put(matrix.m12).put(matrix.m13);
-    buffer.put(matrix.m20).put(matrix.m21).put(matrix.m22).put(matrix.m23);
-    buffer.put(matrix.m30).put(matrix.m31).put(matrix.m32).put(matrix.m33);
+  public static void putMatrixInBuffer(Matrix4f matrix, FloatBuffer buffer) {
+    buffer.put(matrix.m00).put(matrix.m10).put(matrix.m20).put(matrix.m30);
+    buffer.put(matrix.m01).put(matrix.m11).put(matrix.m21).put(matrix.m31);
+    buffer.put(matrix.m02).put(matrix.m12).put(matrix.m22).put(matrix.m32);
+    buffer.put(matrix.m03).put(matrix.m13).put(matrix.m23).put(matrix.m33);
   }
 }

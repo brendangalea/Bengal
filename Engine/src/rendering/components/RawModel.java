@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,10 +62,6 @@ public class RawModel {
       GL30.glBindVertexArray(vaoId);
 
       int count = 0;
-      if (indices != null) {
-        bindIndicesBuffer(indices);
-        count = indices.limit()/3;
-      }
 
       for (HashMap.Entry<Attribute, Integer> entry: bindings.entrySet()) {
         Attribute attribute = entry.getKey();
@@ -79,10 +76,12 @@ public class RawModel {
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, attributes.get(attribute), usage);
         GL20.glVertexAttribPointer(attributeId, attribute.getSize(), GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
         count = attributes.get(attribute).limit() / attribute.getSize();
       }
-
+      if (indices != null) {
+        bindIndicesBuffer(indices);
+        count = indices.limit();
+      }
 
       GL30.glBindVertexArray(0);
       return new RawModel(vaoId, count, vbos);

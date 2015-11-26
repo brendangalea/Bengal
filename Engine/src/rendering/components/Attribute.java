@@ -16,7 +16,6 @@ public class Attribute {
   public static Attribute SIZE = new Attribute("size", 1, Type.FLOAT);
   public static Attribute INDEX = new Attribute("index", 1, Type.FLOAT);
   public static Attribute INDICES = new Attribute("INDICES", 1, Type.INT);
-  public static Attribute BANANA = new Attribute("banana", 2, Type.FLOAT);
 
 
 

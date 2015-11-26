@@ -9,7 +9,6 @@ import rendering.utils.WindowManager;
 import toolbox.utils.Buffers;
 import toolbox.utils.Matrices;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -37,7 +36,7 @@ public class Raster {
   private Map<Integer, List<Renderable>> sceneObjects = new HashMap<>();
 
   public Raster(WindowManager windowManager) {
-    Buffers.storeMatrixInBuffer(
+    Buffers.putMatrixInBuffer(
         Matrices.createProjectionMatrix(0.1f, 1000f, 70f, windowManager.getWidth(), windowManager.getHeight()),
         projectionBuffer);
     projectionBuffer.flip();
@@ -45,16 +44,19 @@ public class Raster {
 
   public void prepare() {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
-    GL11.glClearColor(0.1f, 0.5f, 0.9f, 0.0f);
+    GL11.glClearColor(0x5d / 255.f, 0xbf / 255.f, 0xde / 255.f, 0.0f);
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
   }
 
   public void render(ShaderProgram shader, Camera camera) {
 
-    GL20.glUniformMatrix4fv(
-        shader.getUniforms().get(Uniform.PROJECTION),
-        false,
-        projectionBuffer);
+    if (shader.getUniforms().containsKey(Uniform.PROJECTION)) {
+      GL20.glUniformMatrix4fv(
+          shader.getUniforms().get(Uniform.PROJECTION),
+          false,
+          projectionBuffer);
+
+    }
 
     if (clipPlane != null && shader.getUniforms().containsKey(Uniform.CLIPPING_PLANE)) {
       int loc = shader.getUniforms().get(Uniform.CLIPPING_PLANE);
@@ -74,7 +76,10 @@ public class Raster {
     }
 
     if (shader.getUniforms().containsKey(Uniform.VIEWING)) {
-      loadViewingMatrix(shader, camera);
+      GL20.glUniformMatrix4fv(
+          shader.getUniforms().get(Uniform.VIEWING),
+          false,
+          camera.getViewingBuffer());
     }
 
     for (int vaoId: sceneObjects.keySet()) {
@@ -97,17 +102,6 @@ public class Raster {
 
   public boolean removeObject(Renderable obj) {
     return sceneObjects.containsKey(obj.getVaoId()) && sceneObjects.get(obj.getVaoId()).remove(obj);
-  }
-
-  private void loadViewingMatrix(ShaderProgram shader, Camera camera) {
-    Matrix4f matrix = Matrices.createViewMatrix(camera);
-    viewBuffer.clear();
-    Buffers.storeMatrixInBuffer(matrix, viewBuffer);
-    viewBuffer.flip();
-    GL20.glUniformMatrix4fv(
-        shader.getUniforms().get(Uniform.VIEWING),
-        false,
-        viewBuffer);
   }
 
 }

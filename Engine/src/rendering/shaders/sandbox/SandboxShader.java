@@ -6,8 +6,8 @@ import rendering.components.ShaderProgram;
 import java.util.Arrays;
 import java.util.List;
 
-import static rendering.components.Attribute.BANANA;
 import static rendering.components.Attribute.POSITION;
+import static rendering.components.Attribute.TEXTURE_COORDS;
 
 /**
  * Class for practicing with shaders
@@ -17,7 +17,7 @@ public class SandboxShader extends ShaderProgram {
 
   private static final String VERTEX_FILE = "Engine/src/rendering/shaders/sandbox/vertex.glsl";
   private static final String FRAGMENT_FILE = "Engine/src/rendering/shaders/sandbox/fragment.glsl";
-  private static final List<Attribute> attributeList = Arrays.asList(POSITION, BANANA);
+  private static final List<Attribute> attributeList = Arrays.asList(POSITION, TEXTURE_COORDS);
 
   public SandboxShader() {
     super(VERTEX_FILE, FRAGMENT_FILE);
