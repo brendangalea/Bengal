@@ -1,19 +1,12 @@
-package rendering.shaders;
+package rendering.components;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import rendering.components.Attribute;
-import rendering.components.Uniform;
-import toolbox.utils.Buffers;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -21,7 +14,7 @@ import java.util.Map;
  */
 public abstract class ShaderProgram {
 
-  private int programId;
+  private int programId = -1;
   private int vertexShaderId;
   private int fragmentShaderId;
   private Map<Attribute, Integer> attributes = new HashMap<>();
@@ -30,13 +23,6 @@ public abstract class ShaderProgram {
   public ShaderProgram(String vertexFile, String fragmentFile) {
     vertexShaderId = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
     fragmentShaderId = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
-    programId = GL20.glCreateProgram();
-    GL20.glAttachShader(programId, vertexShaderId);
-    GL20.glAttachShader(programId, fragmentShaderId);
-    bindAttributes();
-    GL20.glLinkProgram(programId);
-    GL20.glValidateProgram(programId);
-    getAllUniformLocations();
   }
 
   public Map<Attribute, Integer> getAttributes() {
@@ -47,7 +33,23 @@ public abstract class ShaderProgram {
     return uniforms;
   }
 
+  public void init() {
+    init(bindingsForSet(this));
+  }
+  public void init(Map<Attribute, Integer> bindings) {
+    programId = GL20.glCreateProgram();
+    GL20.glAttachShader(programId, vertexShaderId);
+    GL20.glAttachShader(programId, fragmentShaderId);
+    bindAttributes(bindings);
+    GL20.glLinkProgram(programId);
+    GL20.glValidateProgram(programId);
+    getAllUniformLocations();
+  }
+
   public void start() {
+//    if (programId == -1) {
+//      init();
+//    }
     GL20.glUseProgram(programId);
   }
 
@@ -64,15 +66,25 @@ public abstract class ShaderProgram {
     GL20.glDeleteProgram(programId);
   }
 
-  protected abstract void bindAttributes();
+  public static Map<Attribute, Integer> bindingsForSet(ShaderProgram... shaders) {
+    Map<Attribute, Integer> bindings = new HashMap<>();
+    Set<String> names = new HashSet<>();
+    int location = 0;
+    for (ShaderProgram shader: shaders) {
+      for (Attribute attribute: shader.getAttributeList()) {
+        if (names.contains(attribute.getName()) && !bindings.containsKey(attribute)) {
+          throw new IllegalArgumentException(String.format("Conflicting types for attribute: %s", attribute.getName()));
+        }
+        names.add(attribute.getName());
+        bindings.put(attribute, location++);
+      }
+    }
+    return bindings;
+  }
+
+  protected abstract List<Attribute> getAttributeList();
 
   protected abstract void getAllUniformLocations();
-
-
-  protected void bindAttribute(int attributeId, Attribute attribute) {
-    attributes.put(attribute, attributeId);
-    GL20.glBindAttribLocation(programId, attributeId, attribute.getName());
-  }
 
   protected int getUniformLocation(Uniform uniform) {
     int uniformId = GL20.glGetUniformLocation(programId, uniform.getName());
@@ -80,21 +92,15 @@ public abstract class ShaderProgram {
     return uniformId;
   }
 
-  protected void loadFloat(int location, float value) {
-    GL20.glUniform1f(location, value);
-  }
-
-  protected void loadVector(int location, Vector3f vector) {
-    GL20.glUniform3f(location, vector.x, vector.y, vector.z);
-  }
-
-  protected void loadBoolean(int location, boolean value) {
-    GL20.glUniform1f(location, value ? 1 : 0);
-  }
-
-  protected void loadMatrix(int location, Matrix4f matrix) {
-    FloatBuffer matrixBuffer = Buffers.bufferWithMatrix(matrix);
-    GL20.glUniformMatrix4fv(location, false, matrixBuffer);
+  private void bindAttributes(Map<Attribute, Integer> bindings) {
+    for (Attribute attribute: getAttributeList()) {
+      if (!bindings.containsKey(attribute)) {
+        throw new IllegalArgumentException("No binding found for attribute " + attribute.getName());
+      }
+      int location = bindings.get(attribute);
+      attributes.put(attribute, location);
+      GL20.glBindAttribLocation(programId, location, attribute.getName());
+    }
   }
 
   private static int loadShader(String file, int type) {
@@ -119,5 +125,7 @@ public abstract class ShaderProgram {
     }
     return shaderId;
   }
+
+
 }
 

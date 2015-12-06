@@ -5,9 +5,16 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import rendering.components.Raster;
+import rendering.shaders.diffuse.DiffuseShader;
+import rendering.shaders.skybox.SkyboxShader;
+import rendering.utils.Camera;
 import rendering.components.RawModel;
-import rendering.utils.Loader;
+import rendering.components.ShaderProgram;
+import rendering.utils.Camera3rdPerson;
 import rendering.utils.WindowManager;
+
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
@@ -19,16 +26,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class CubeWorld {
 
-  private static final float[] vertices = {
-      -0.5f, 0.5f, 0f,
-      -0.5f, -0.5f, 0f,
-      0.5f, -0.5f, 0f,
-      0.5f, -0.5f, 0f,
-      0.5f, 0.5f, 0f,
-      -0.5f, 0.5f, 0f
-  };
-
-  private WindowManager windowManager = new WindowManager("Cube Demo", 480, 320);
+  private WindowManager windowManager = new WindowManager("Cube Demo", 960, 640);
 
   public static void main(String[] args) {
     new CubeWorld().run();
@@ -47,12 +45,23 @@ public class CubeWorld {
   }
 
   public void render(RawModel model) {
+//    FloatBuffer viewBuffer = Buffers.bufferWithMatrix(Matrices.createViewMatrix(camera));
+//    GL20.glUniformMatrix4fv(
+//        shader.getUniforms().get(Uniform.VIEWING),
+//        false,
+//        viewBuffer);
+
     GL30.glBindVertexArray(model.getVaoId());
     GL20.glEnableVertexAttribArray(0);
-    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+    GL20.glEnableVertexAttribArray(1);
+//    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+    GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
     GL20.glDisableVertexAttribArray(0);
+    GL20.glEnableVertexAttribArray(1);
     GL30.glBindVertexArray(0);
   }
+
+
   public void loop() {
     // This line is critical for LWJGL's interoperation with GLFW's
     // OpenGL context, or any context that is managed externally.
@@ -61,19 +70,50 @@ public class CubeWorld {
     // bindings available for use.
     GL.createCapabilities();
 
+    // initialize phong shader
+//    shader = new PhongShader();
+    ShaderProgram shader = new DiffuseShader();
+    shader.init();
+
+    Camera3rdPerson camera = new Camera3rdPerson();
+    camera.setPosition(new Vector3f(0, 1, -5.0f));
+    camera.setPitch(15);
+    Cube cube = new Cube(shader.getAttributes());
+    Terrain terrain = new Terrain(new Vector3f(-400, 0, -400), shader.getAttributes());
+    Raster raster = new Raster(windowManager);
+    raster.addObject(cube);
+    raster.addObject(terrain);
+
+    SkyboxShader skyboxShader = new SkyboxShader();
+    Raster skyboxRaster = new Raster(windowManager);
+    skyboxShader.init();
+    Skybox skybox = new Skybox(skyboxShader.getAttributes());
+    skyboxRaster.addObject(skybox);
+
     // Set the clear color
-    glClearColor(0x5d/255.f, 0xbf/255.f, 0xde/255.f, 0.0f);
+    glClearColor(0x5d / 255.f, 0xbf / 255.f, 0xde / 255.f, 0.0f);
 
-    Loader loader = new Loader();
-
-    RawModel model = loader.loadToVao(vertices);
-    System.out.println(model.getVertexCount());
     // Run the rendering loop until the user has attempted to close
     // the window or has pressed the ESCAPE key.
     while (!windowManager.shouldClose()) {
+
+      cube.update(camera);
+      camera.update();
+      Vector3f follow = new Vector3f(cube.getCenter());
+      follow.y = 0.5f;
+      camera.follow(follow);
+
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-      render(model);
+      raster.prepare();
+      shader.start();
+      raster.render(shader, camera);
+      shader.stop();
+
+      skyboxShader.start();
+      skyboxRaster.render(skyboxShader, camera);
+      skyboxShader.stop();
+
 
       glfwSwapBuffers(windowManager.getWindowId()); // swap the color buffers
 
@@ -82,6 +122,10 @@ public class CubeWorld {
       glfwPollEvents();
     }
 
-    loader.cleanUp();
+    shader.cleanUp();
+    skyboxShader.cleanUp();
+    cube.release();
+    terrain.release();
+    skybox.release();
   }
 }

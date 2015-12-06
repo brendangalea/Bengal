@@ -1,8 +1,8 @@
-package rendering.shaders.phong;
+package rendering.shaders.diffuse;
 
 import rendering.components.Attribute;
-import rendering.components.Uniform;
 import rendering.components.ShaderProgram;
+import rendering.components.Uniform;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,16 +10,16 @@ import java.util.List;
 import static rendering.components.Attribute.*;
 
 /**
- * Phong Shader
- * Created by Brendan Galea on 11/23/2015.
+ * Very Simple Shader
+ * Created by Brendan Galea on 11/25/2015.
  */
-public class PhongShader extends ShaderProgram {
+public class DiffuseShader extends ShaderProgram {
 
-  private static final String VERTEX_FILE = "Engine/src/rendering/shaders/phong/vertex.glsl";
-  private static final String FRAGMENT_FILE = "Engine/src/rendering/shaders/phong/fragment.glsl";
-  private static final List<Attribute> attributeList = Arrays.asList(POSITION, NORMAL, COLOR);
+  private static final String VERTEX_FILE = "Engine/src/rendering/shaders/diffuse/vertex.glsl";
+  private static final String FRAGMENT_FILE = "Engine/src/rendering/shaders/diffuse/fragment.glsl";
+  private static final List<Attribute> attributeList = Arrays.asList(POSITION, NORMAL, TEXTURE_COORDS);
 
-  public PhongShader() {
+  public DiffuseShader() {
     super(VERTEX_FILE, FRAGMENT_FILE);
   }
 
@@ -37,4 +37,3 @@ public class PhongShader extends ShaderProgram {
   }
 
 }
-
