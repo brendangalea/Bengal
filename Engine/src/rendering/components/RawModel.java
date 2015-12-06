@@ -5,9 +5,11 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,5 +99,58 @@ public class RawModel {
     }
 
 
+    public void writeToFile(String filepath) throws IOException {
+
+      BufferedWriter file = new BufferedWriter(new FileWriter(filepath));
+      FloatBuffer vertices = attributes.get(Attribute.POSITION);
+      for (int i = 0; i < vertices.limit(); i+=3) {
+        file.write(String.format("v %f %f %f\n", vertices.get(i), vertices.get(i+1), vertices.get(i+2)));
+      }
+
+      if (attributes.containsKey(Attribute.NORMAL)) {
+        FloatBuffer normals = attributes.get(Attribute.NORMAL);
+        for (int i = 0; i < normals.limit(); i+=3) {
+          file.write(String.format("vn %f %f %f\n", normals.get(i), normals.get(i+1), normals.get(i+2)));
+        }
+      }
+
+      if (attributes.containsKey(Attribute.TEXTURE_COORDS)) {
+        FloatBuffer textureCoords = attributes.get(Attribute.TEXTURE_COORDS);
+        for (int i = 0; i < textureCoords.limit(); i+=2) {
+          file.write(String.format("vt %f %f\n", textureCoords.get(i), textureCoords.get(i+1)));
+        }
+      }
+
+      if (indices != null) {
+        for (int i = 0; i < indices.limit(); i+=3) {
+          file.write(String.format("f %s %s %s\n",
+              writeFaceVertex(indices.get(i) + 1),
+              writeFaceVertex(indices.get(i+1) + 1),
+              writeFaceVertex(indices.get(i+2) + 1)));
+        }
+      } else {
+        for (int i = 0; i < vertices.limit(); i+=3) {
+          file.write(String.format("f %s %s %s\n",
+              writeFaceVertex(i + 1),
+              writeFaceVertex(i + 2),
+              writeFaceVertex(i + 3)));
+        }
+      }
+
+      file.flush();
+      file.close();
+    }
+
+    private String writeFaceVertex(int index) {
+      if (attributes.containsKey(Attribute.TEXTURE_COORDS) && attributes.containsKey(Attribute.NORMAL))
+        return String.format("%d/%d/%d", index, index, index);
+      else if (attributes.containsKey(Attribute.TEXTURE_COORDS))
+        return String.format("%d/%d", index, index);
+      else if (attributes.containsKey(Attribute.NORMAL))
+        return String.format("%d//%d", index, index);
+      return "" + index;
+    }
   }
+
+
 }

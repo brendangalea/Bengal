@@ -1,17 +1,17 @@
 package demos.cubeworld;
 
-import input.KeyboardHandler;
 import input.XboxControllerHandler;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.*;
 import rendering.components.*;
 import rendering.utils.Camera;
 import rendering.utils.Loader;
+import rendering.utils.WavefrontObject;
 import toolbox.utils.Buffers;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -37,51 +37,22 @@ public class Cube implements Renderable {
   private int holdCount;
   private boolean stillJumping = false;
 
-
-  private static final float[] vertices = {
-      -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-      -0.5f, 0.5f, -0.5f,-0.5f, -0.5f, -0.5f,0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f,
-      0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f,
-      -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f,
-      0.5f, 0.5f, 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
-      0.5f, -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, -0.5f,
-  };
-
-  private static final int[] indices = {
-      0, 1, 3, 3, 1, 2,
-      4, 7, 5, 7, 6, 5,
-      8, 9, 10, 9, 11, 10,
-      12, 13, 14, 13, 14, 15,
-      16, 17, 18, 17, 18, 19,
-      20, 21, 22, 21, 22, 23
-  };
-
-  private static final float[] uvs = {
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-      0.f, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0.f,
-  };
-
-  private static final float[] normals = {
-      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-      -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0
-  };
-
   public Cube(Map< Attribute, Integer> bindings) {
 
-    rawModel = new RawModel.Builder()
-        .addAttribute(Attribute.POSITION, Buffers.bufferWithValues(vertices), false)
-        .addAttribute(Attribute.NORMAL, Buffers.bufferWithValues(normals), false)
-        .addAttribute(Attribute.TEXTURE_COORDS, Buffers.bufferWithValues(uvs), false)
-        .setIndices(Buffers.bufferWithValues(indices))
-        .build(bindings);
+
+    try {
+      WavefrontObject cubeObjFile = new WavefrontObject("Engine/src/demos/cubeworld/cube.obj");
+      rawModel = new RawModel.Builder()
+          .addAttribute(Attribute.POSITION, cubeObjFile.getVertexBuffer(), false)
+          .addAttribute(Attribute.NORMAL, cubeObjFile.getNormalBuffer(), false)
+          .addAttribute(Attribute.TEXTURE_COORDS, cubeObjFile.getTextureBuffer(), false)
+          .setIndices(cubeObjFile.getIndexBuffer())
+          .build(bindings);
+    } catch (IllegalArgumentException e) {
+      System.out.println("Error: " + e);
+      e.printStackTrace();
+      System.exit(1);
+    }
 
 //    rawModel = new Loader().loadToVao(vertices, uvs, indices);
     textureId = new Loader().loadTexture("res/cube_texture.png");
