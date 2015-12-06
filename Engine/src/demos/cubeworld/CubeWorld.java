@@ -7,12 +7,11 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import rendering.components.Raster;
 import rendering.shaders.diffuse.DiffuseShader;
-import rendering.shaders.phong.PhongShader;
-import rendering.shaders.sandbox.SandboxShader;
+import rendering.shaders.skybox.SkyboxShader;
 import rendering.utils.Camera;
 import rendering.components.RawModel;
 import rendering.components.ShaderProgram;
-import rendering.utils.Loader;
+import rendering.utils.Camera3rdPerson;
 import rendering.utils.WindowManager;
 
 import javax.vecmath.Vector3f;
@@ -27,8 +26,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class CubeWorld {
 
-  private WindowManager windowManager = new WindowManager("Cube Demo", 480, 320);
-  private Camera camera = new Camera();
+  private WindowManager windowManager = new WindowManager("Cube Demo", 960, 640);
 
   public static void main(String[] args) {
     new CubeWorld().run();
@@ -76,13 +74,21 @@ public class CubeWorld {
 //    shader = new PhongShader();
     ShaderProgram shader = new DiffuseShader();
     shader.init();
-    shader.start();
 
-    camera.setPosition(new Vector3f(0, 0, -5.0f));
-    camera.setYaw(180);
+    Camera3rdPerson camera = new Camera3rdPerson();
+    camera.setPosition(new Vector3f(0, 1, -5.0f));
+    camera.setPitch(15);
     Cube cube = new Cube(shader.getAttributes());
+    Terrain terrain = new Terrain(new Vector3f(-400, 0, -400), shader.getAttributes());
     Raster raster = new Raster(windowManager);
     raster.addObject(cube);
+    raster.addObject(terrain);
+
+    SkyboxShader skyboxShader = new SkyboxShader();
+    Raster skyboxRaster = new Raster(windowManager);
+    skyboxShader.init();
+    Skybox skybox = new Skybox(skyboxShader.getAttributes());
+    skyboxRaster.addObject(skybox);
 
     // Set the clear color
     glClearColor(0x5d / 255.f, 0xbf / 255.f, 0xde / 255.f, 0.0f);
@@ -90,10 +96,25 @@ public class CubeWorld {
     // Run the rendering loop until the user has attempted to close
     // the window or has pressed the ESCAPE key.
     while (!windowManager.shouldClose()) {
-      camera.move();
+
+      cube.update(camera);
+      camera.update();
+      Vector3f follow = new Vector3f(cube.getCenter());
+      follow.y = 0.5f;
+      camera.follow(follow);
+
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
       raster.prepare();
+      shader.start();
       raster.render(shader, camera);
+      shader.stop();
+
+      skyboxShader.start();
+      skyboxRaster.render(skyboxShader, camera);
+      skyboxShader.stop();
+
+
       glfwSwapBuffers(windowManager.getWindowId()); // swap the color buffers
 
       // Poll for window events. The key callback above will only be
@@ -102,5 +123,9 @@ public class CubeWorld {
     }
 
     shader.cleanUp();
+    skyboxShader.cleanUp();
+    cube.release();
+    terrain.release();
+    skybox.release();
   }
 }

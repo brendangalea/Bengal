@@ -1,7 +1,7 @@
 package rendering.utils;
 
 import input.KeyboardHandler;
-import org.lwjgl.BufferUtils;
+import input.XboxControllerHandler;
 import org.lwjgl.glfw.GLFW;
 import toolbox.utils.Buffers;
 
@@ -31,7 +31,8 @@ public class Camera {
     return viewingBuffer;
   }
 
-  public void move() {
+  public void update() {
+
     float delta = speed;
     if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
       delta = speed * 5;
@@ -51,16 +52,16 @@ public class Camera {
     }
 
     if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_UP)) {
-      pitch -= delta*60;
+      pitch -= 0.03*60;
     }
     if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_DOWN)) {
-      pitch += delta*60;
+      pitch += 0.03*60;
     }
     if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_RIGHT)) {
-      yaw += delta*60;
+      yaw += 0.03*60;
     }
     if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_LEFT)) {
-      yaw -= delta*60;
+      yaw -= 0.03*60;
     }
 
 
@@ -139,7 +140,7 @@ public class Camera {
     updateViewingBuffer();
   }
 
-  private void updateViewingBuffer() {
+  protected void updateViewingBuffer() {
     // TODO optimize this viewing transform
     viewingMatrix.setIdentity();
 

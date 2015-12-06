@@ -7,9 +7,7 @@ import rendering.components.Uniform;
 import java.util.Arrays;
 import java.util.List;
 
-import static rendering.components.Attribute.COLOR;
-import static rendering.components.Attribute.NORMAL;
-import static rendering.components.Attribute.POSITION;
+import static rendering.components.Attribute.*;
 
 /**
  * Very Simple Shader
@@ -19,7 +17,7 @@ public class DiffuseShader extends ShaderProgram {
 
   private static final String VERTEX_FILE = "Engine/src/rendering/shaders/diffuse/vertex.glsl";
   private static final String FRAGMENT_FILE = "Engine/src/rendering/shaders/diffuse/fragment.glsl";
-  private static final List<Attribute> attributeList = Arrays.asList(POSITION, NORMAL);
+  private static final List<Attribute> attributeList = Arrays.asList(POSITION, NORMAL, TEXTURE_COORDS);
 
   public DiffuseShader() {
     super(VERTEX_FILE, FRAGMENT_FILE);

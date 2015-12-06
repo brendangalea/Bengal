@@ -1,17 +1,17 @@
 package demos.cubeworld;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import input.KeyboardHandler;
+import input.XboxControllerHandler;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.*;
 import rendering.components.*;
+import rendering.utils.Camera;
 import rendering.utils.Loader;
 import toolbox.utils.Buffers;
 
 import javax.vecmath.Matrix4f;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.util.Map;
 
 
@@ -22,8 +22,21 @@ import java.util.Map;
 public class Cube implements Renderable {
 
   private RawModel rawModel;
+  private int textureId;
+  private XboxControllerHandler controller;
+  private boolean isGrounded = true;
+  private Vector3f center = new Vector3f();
 
   private Matrix4f transformation;
+
+  private float yvel = 0;
+  private static final float g = -9.81f;
+  private static final float dt = 0.05f;
+  private float speed = 0.1f;
+
+  private int holdCount;
+  private boolean stillJumping = false;
+
 
   private static final float[] vertices = {
       -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
@@ -40,6 +53,7 @@ public class Cube implements Renderable {
       8, 9, 10, 9, 11, 10,
       12, 13, 14, 13, 14, 15,
       16, 17, 18, 17, 18, 19,
+      20, 21, 22, 21, 22, 23
   };
 
   private static final float[] uvs = {
@@ -70,10 +84,69 @@ public class Cube implements Renderable {
         .build(bindings);
 
 //    rawModel = new Loader().loadToVao(vertices, uvs, indices);
+    textureId = new Loader().loadTexture("res/cube_texture.png");
     transformation = new Matrix4f();
     transformation.setIdentity();
+    transformation.setTranslation(new Vector3f(0f, 0.5f, 0f));
+
+    controller = new XboxControllerHandler(0);
   }
 
+
+  public Vector3f getCenter() {
+    return center;
+  }
+
+  public void update(Camera camera) {
+
+    // physics
+    float height = transformation.m13 - 0.5f;
+    if (!isGrounded && !stillJumping) {
+      yvel += dt * g;
+    }
+    height += yvel * dt;
+    if (height < 0) {
+      height = 0;
+      isGrounded = true;
+    }
+    transformation.m13 = height + 0.5f;
+
+
+    // Control
+    boolean isJumpPressed = false;
+    if (controller.isConnected()) {
+      controller.update();
+      Vector2f stick = controller.getLeftJoystick();
+      transformation.m23 += (stick.x * speed) *  Math.sin(Math.toRadians(camera.getYaw()))
+          -(stick.y * speed) * Math.cos(Math.toRadians(camera.getYaw()));
+      transformation.m03 += (stick.x * speed) *  Math.cos(Math.toRadians(camera.getYaw()))
+          + (stick.y * speed) * Math.sin(Math.toRadians(camera.getYaw()));
+      isJumpPressed = controller.isButtonDown(XboxControllerHandler.Button.A);
+    }
+
+
+    if (isJumpPressed && isGrounded) {
+      isGrounded = false;
+      yvel = 5;
+      stillJumping = true;
+      holdCount = 0;
+    }
+
+    if (isJumpPressed) {
+      if (holdCount++ > 12) {
+        stillJumping = false;
+      }
+    } else {
+      stillJumping = false;
+    }
+
+    center.set(transformation.m03, transformation.m13, transformation.m23);
+  }
+
+  public void release() {
+    rawModel.release();
+    GL11.glDeleteTextures(textureId);
+  }
 
   @Override
   public void draw(ShaderProgram shader) {
@@ -94,15 +167,9 @@ public class Cube implements Renderable {
           Buffers.bufferWithMatrix(transformation));
     }
 
-
-    GL30.glBindVertexArray(rawModel.getVaoId());
-    GL20.glEnableVertexAttribArray(0);
-    GL20.glEnableVertexAttribArray(1);
-//    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+    GL13.glActiveTexture(GL13.GL_TEXTURE0);
+    GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
     GL11.glDrawElements(GL11.GL_TRIANGLES, rawModel.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-    GL20.glDisableVertexAttribArray(0);
-    GL20.glEnableVertexAttribArray(1);
-    GL30.glBindVertexArray(0);
 
   }
 
