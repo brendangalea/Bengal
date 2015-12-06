@@ -32,7 +32,8 @@ public class XboxControllerHandler {
   }
 
   public boolean isConnected() {
-    return GLFW.glfwGetJoystickName(GLFW.GLFW_JOYSTICK_1 + controllerNumber) != null;
+    String name = GLFW.glfwGetJoystickName(GLFW.GLFW_JOYSTICK_1 + controllerNumber);
+    return name != null && !name.isEmpty();
   }
 
   public void update() {
