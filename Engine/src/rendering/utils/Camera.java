@@ -119,6 +119,7 @@ public class Camera {
   }
 
   public void lookAt(Vector3f target, Vector3f up) {
+
     Vector3f zAxis = new Vector3f();
     Vector3f yAxis = new Vector3f();
     Vector3f xAxis = new Vector3f();
