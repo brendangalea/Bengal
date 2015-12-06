@@ -8,7 +8,6 @@
     </CLASSES>
     <JAVADOC>
       <root url="file://$PROJECT_DIR$/libs" />
-      <root url="jar://$PROJECT_DIR$/libs/lwjgl3/doc/javadoc.zip!/" />
     </JAVADOC>
     <NATIVE>
       <root url="file://$PROJECT_DIR$/libs/lwjgl3/native" />
