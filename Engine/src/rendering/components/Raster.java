@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import rendering.utils.Camera;
 import rendering.utils.WindowManager;
-import toolbox.utils.Buffers;
-import toolbox.utils.Matrices;
+import bgtools.utils.Buffers;
+import bgtools.utils.Matrices;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -36,7 +36,7 @@ public class Raster {
   private Map<Integer, List<Renderable>> sceneObjects = new HashMap<>();
 
   public Raster(WindowManager windowManager) {
-    Buffers.putMatrixInBuffer(
+    Buffers.put(
         Matrices.createProjectionMatrix(0.1f, 1000f, 70f, windowManager.getWidth(), windowManager.getHeight()),
         projectionBuffer);
     projectionBuffer.flip();

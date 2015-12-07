@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import rendering.components.*;
 import rendering.utils.Loader;
-import toolbox.utils.Buffers;
+import bgtools.utils.Buffers;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;

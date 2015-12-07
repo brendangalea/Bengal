@@ -1,8 +1,9 @@
-package toolbox.utils;
+package bgtools.utils;
 
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Tuple3f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
@@ -87,10 +88,14 @@ public class Buffers {
     return interleaved;
   }
 
-  public static void putMatrixInBuffer(Matrix4f matrix, FloatBuffer buffer) {
+  public static void put(Matrix4f matrix, FloatBuffer buffer) {
     buffer.put(matrix.m00).put(matrix.m10).put(matrix.m20).put(matrix.m30);
     buffer.put(matrix.m01).put(matrix.m11).put(matrix.m21).put(matrix.m31);
     buffer.put(matrix.m02).put(matrix.m12).put(matrix.m22).put(matrix.m32);
     buffer.put(matrix.m03).put(matrix.m13).put(matrix.m23).put(matrix.m33);
+  }
+
+  public static void put(Tuple3f tuple3f, FloatBuffer buffer) {
+    buffer.put(tuple3f.x).put(tuple3f.y).put(tuple3f.z);
   }
 }

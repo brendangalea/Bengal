@@ -1,9 +1,8 @@
 package rendering.utils;
 
 import input.KeyboardHandler;
-import input.XboxControllerHandler;
 import org.lwjgl.glfw.GLFW;
-import toolbox.utils.Buffers;
+import bgtools.utils.Buffers;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -154,7 +153,7 @@ public class Camera {
     viewingMatrix.mul(m1, viewingMatrix);
 
     viewingBuffer.clear();
-    Buffers.putMatrixInBuffer(viewingMatrix, viewingBuffer);
+    Buffers.put(viewingMatrix, viewingBuffer);
     viewingBuffer.flip();
   }
 

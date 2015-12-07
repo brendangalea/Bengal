@@ -6,12 +6,11 @@ import rendering.components.*;
 import rendering.utils.Camera;
 import rendering.utils.Loader;
 import rendering.utils.WavefrontObject;
-import toolbox.utils.Buffers;
+import bgtools.utils.Buffers;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.io.IOException;
 import java.util.Map;
 
 

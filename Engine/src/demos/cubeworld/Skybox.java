@@ -7,7 +7,7 @@ import rendering.components.RawModel;
 import rendering.components.Renderable;
 import rendering.components.ShaderProgram;
 import rendering.utils.Loader;
-import toolbox.utils.Buffers;
+import bgtools.utils.Buffers;
 
 import java.util.Map;
 

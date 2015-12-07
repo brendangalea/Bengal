@@ -1,4 +1,4 @@
-package toolbox.utils;
+package bgtools.utils;
 
 import rendering.utils.Camera;
 
