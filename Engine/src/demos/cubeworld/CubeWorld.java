@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL30;
 import rendering.components.Raster;
 import rendering.shaders.diffuse.DiffuseShader;
 import rendering.shaders.skybox.SkyboxShader;
-import rendering.utils.Camera;
 import rendering.components.RawModel;
 import rendering.components.ShaderProgram;
 import rendering.utils.Camera3rdPerson;
@@ -43,24 +42,6 @@ public class CubeWorld {
       windowManager.terminate();
     }
   }
-
-  public void render(RawModel model) {
-//    FloatBuffer viewBuffer = Buffers.bufferWithMatrix(Matrices.createViewMatrix(camera));
-//    GL20.glUniformMatrix4fv(
-//        shader.getUniforms().get(Uniform.VIEWING),
-//        false,
-//        viewBuffer);
-
-    GL30.glBindVertexArray(model.getVaoId());
-    GL20.glEnableVertexAttribArray(0);
-    GL20.glEnableVertexAttribArray(1);
-//    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
-    GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-    GL20.glDisableVertexAttribArray(0);
-    GL20.glEnableVertexAttribArray(1);
-    GL30.glBindVertexArray(0);
-  }
-
 
   public void loop() {
     // This line is critical for LWJGL's interoperation with GLFW's

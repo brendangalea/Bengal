@@ -62,6 +62,9 @@ public class Cube implements Renderable {
     controller = new XboxControllerHandler(0);
   }
 
+  public Matrix4f getTransformation() {
+    return transformation;
+  }
 
   public Vector3f getCenter() {
     return center;
