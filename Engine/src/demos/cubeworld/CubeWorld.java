@@ -2,13 +2,12 @@ package demos.cubeworld;
 
 import org.lwjgl.Version;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import rendering.components.Raster;
+import rendering.postprocessing.Fbo;
+import rendering.postprocessing.PostProcessing;
+import rendering.shaders.contrast.ContrastShader;
 import rendering.shaders.diffuse.DiffuseShader;
 import rendering.shaders.skybox.SkyboxShader;
-import rendering.components.RawModel;
 import rendering.components.ShaderProgram;
 import rendering.utils.Camera3rdPerson;
 import rendering.utils.WindowManager;
@@ -51,6 +50,9 @@ public class CubeWorld {
     // bindings available for use.
     GL.createCapabilities();
 
+    Fbo fbo = new Fbo(windowManager.getWidth(), windowManager.getHeight(), Fbo.DEPTH_RENDER_BUFFER, windowManager);
+    PostProcessing.init(windowManager);
+
     // initialize phong shader
 //    shader = new PhongShader();
     ShaderProgram shader = new DiffuseShader();
@@ -86,6 +88,7 @@ public class CubeWorld {
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
+      fbo.bindFrameBuffer();
       raster.prepare();
       shader.start();
       raster.render(shader, camera);
@@ -95,6 +98,8 @@ public class CubeWorld {
       skyboxRaster.render(skyboxShader, camera);
       skyboxShader.stop();
 
+      fbo.unbindFrameBuffer();
+      PostProcessing.doPostProcessing(fbo.getColourTexture());
 
       glfwSwapBuffers(windowManager.getWindowId()); // swap the color buffers
 
@@ -108,5 +113,6 @@ public class CubeWorld {
     cube.release();
     terrain.release();
     skybox.release();
+    fbo.cleanUp();
   }
 }

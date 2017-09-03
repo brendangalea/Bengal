@@ -64,7 +64,6 @@ public class RawModel {
       GL30.glBindVertexArray(vaoId);
 
       int count = 0;
-
       for (HashMap.Entry<Attribute, Integer> entry: bindings.entrySet()) {
         Attribute attribute = entry.getKey();
         int attributeId = entry.getValue();

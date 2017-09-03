@@ -50,6 +50,9 @@ public abstract class ShaderProgram {
 //    if (programId == -1) {
 //      init();
 //    }
+    if (programId == -1) {
+      throw new RuntimeException("Shader has not been initialized");
+    }
     GL20.glUseProgram(programId);
   }
 

@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class in charge of rendering all
- * objects in the scene
+ * Collection of objects to be rendered, that share a compatible shader
  *
  * Created by brendan on 15-07-11.
  */

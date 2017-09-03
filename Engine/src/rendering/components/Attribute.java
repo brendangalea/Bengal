@@ -10,13 +10,14 @@ public class Attribute {
   public enum Type {BOOL, INT, FLOAT}
 
   public static Attribute POSITION = new Attribute("position", 3, Type.FLOAT);
+  public static Attribute POSITION2F = new Attribute("position", 2, Type.FLOAT);
   public static Attribute NORMAL = new Attribute("normal", 3, Type.FLOAT);
   public static Attribute TEXTURE_COORDS = new Attribute("textureCoords", 2, Type.FLOAT);
   public static Attribute COLOR = new Attribute("color", 3, Type.FLOAT);
   public static Attribute SIZE = new Attribute("size", 1, Type.FLOAT);
   public static Attribute INDEX = new Attribute("index", 1, Type.FLOAT);
   public static Attribute INDICES = new Attribute("INDICES", 1, Type.INT);
-
+  public static Attribute RADIUS = new Attribute("radius", 1, Type.FLOAT);
 
 
   private final String name;

@@ -1,6 +1,8 @@
 package demos.cubeworld;
 
+import input.KeyboardHandler;
 import input.XboxControllerHandler;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.*;
 import rendering.components.*;
 import rendering.utils.Camera;
@@ -95,6 +97,22 @@ public class Cube implements Renderable {
       transformation.m03 += (stick.x * speed) *  Math.cos(Math.toRadians(camera.getYaw()))
           + (stick.y * speed) * Math.sin(Math.toRadians(camera.getYaw()));
       isJumpPressed = controller.isButtonDown(XboxControllerHandler.Button.A);
+    } else {
+      int x = 0;
+      int y = 0;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_D))
+        x = 1;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_A))
+        x = -1;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_W))
+        y = 1;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_S))
+        y = -1;
+      transformation.m23 += (x * speed) *  Math.sin(Math.toRadians(camera.getYaw()))
+          -(y * speed) * Math.cos(Math.toRadians(camera.getYaw()));
+      transformation.m03 += (x * speed) *  Math.cos(Math.toRadians(camera.getYaw()))
+          + (y * speed) * Math.sin(Math.toRadians(camera.getYaw()));
+      isJumpPressed = KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_SPACE);
     }
 
 

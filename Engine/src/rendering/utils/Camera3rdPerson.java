@@ -1,7 +1,9 @@
 package rendering.utils;
 
 
+import input.KeyboardHandler;
 import input.XboxControllerHandler;
+import org.lwjgl.glfw.GLFW;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -37,6 +39,26 @@ public class Camera3rdPerson extends Camera {
       setPitch(pitch);
       setYaw(yaw);
       distance -= ZOOM_SPEED * controller.getTriggers();
+      distance = Math.min(Math.max(distance, MIN_ZOOM), MAX_ZOOM);
+    } else {
+      float pitch = getPitch();
+      float yaw = getYaw();
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_RIGHT))
+        yaw -= ROTATION_SPEED;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_LEFT))
+        yaw += ROTATION_SPEED;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_UP))
+        pitch -= ROTATION_SPEED;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_DOWN))
+        pitch += ROTATION_SPEED;
+      pitch = Math.min(Math.max(0, pitch), 89);
+      yaw %= 360;
+      setPitch(pitch);
+      setYaw(yaw);
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_Q))
+        distance -= ZOOM_SPEED;
+      if (KeyboardHandler.isKeyDown(GLFW.GLFW_KEY_E))
+        distance += ZOOM_SPEED;
       distance = Math.min(Math.max(distance, MIN_ZOOM), MAX_ZOOM);
     }
 
